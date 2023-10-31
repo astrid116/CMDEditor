@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Permissions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -10,10 +11,25 @@ namespace CMDEditor
 {
     internal class Program
     {
+        private static readonly string configFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\cmdeditorconfig\\config";
         static void Main(string[] args)
         {
             string path;
             string filename;
+            string configDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\cmdeditorconfig";
+
+            if (!File.Exists(configFile))
+            {
+                Directory.CreateDirectory(configDir);
+                DirectoryInfo _ = new (configDir)
+                {
+                    Attributes = FileAttributes.Hidden
+                };
+                File.Create(configFile);
+                Console.WriteLine("Successfully initialized config file!");
+            }
+
+
             while (true)
             {
                 while (true)
@@ -63,6 +79,7 @@ namespace CMDEditor
                     if (lineInput == ":q")
                     {
                         Console.Clear();
+                        LastModifiedSave(path);
                         break;
                     }
 
@@ -216,12 +233,74 @@ namespace CMDEditor
                         File.Delete(path);
                         File.Move(tempFile, path);
                     }
+                    else if (lineInput == ":lastmodified")
+                    {
+                        ListLastModified(path);
+                    }
                     else
                     {
-                        Console.WriteLine("Invalid insert format.");
+                        Console.WriteLine("Invalid usage.");
                     }
                 }
             }
+        }
+
+        static void LastModifiedSave(string filePath)
+        {
+            DateTime currentDateTime = DateTime.Now;
+            string path = filePath;
+            string line;
+            bool writePath = true;
+
+            string tempFile = Path.GetTempFileName();
+            var sr = new StreamReader(configFile);
+            var sw = new StreamWriter(tempFile);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] arr = line.Split();
+                if (arr[0] == path)
+                {
+                    line = sr.ReadLine();
+                    line = sr.ReadLine();
+                    sw.WriteLine(path + "\nLast Modified: " + currentDateTime + "\n");
+                    writePath = false;
+                }
+                else
+                {
+                    sw.WriteLine(line);
+                }
+            }
+            if (writePath == true)
+            {
+                sw.WriteLine(path + "\nLast Modified: " + currentDateTime + "\n");
+            }
+
+            sr.Close();
+            sw.Close();
+            File.Delete(configFile);
+            File.Move(tempFile, configFile);
+        }
+
+        static void ListLastModified(string filePath)
+        {
+            string path = filePath;
+            string line;
+            var sr = new StreamReader(configFile);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] arr = line.Split();
+                if (arr[0] == path)
+                {
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        Console.WriteLine(line);
+                        line = sr.ReadLine();
+                    }
+                }
+            }
+            sr.Close();
         }
     }
 }
