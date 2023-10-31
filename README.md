@@ -41,3 +41,5 @@ If you want to list the file that you're currently editing, hit enter without sp
 :clearfile - Clears the file.
 
 :removeemptylines - Removes all the empty lines from the file.
+
+:lastmodified - Shows you when was the last time you edited the file **with this program (ONLY LOGS IF YOU EXIT FROM THE FILE USING :q)**
