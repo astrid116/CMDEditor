@@ -79,7 +79,14 @@ namespace CMDEditor
                     if (lineInput == ":q")
                     {
                         Console.Clear();
-                        LastModifiedSave(path);
+                        try
+                        {
+                            LastModifiedSave(path);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
                         break;
                     }
 
