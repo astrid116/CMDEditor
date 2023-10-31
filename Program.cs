@@ -107,6 +107,10 @@ namespace CMDEditor
                                 {
                                     Console.WriteLine(i + " ~  " + line);
                                 }
+                                else if (i < 100000)
+                                {
+                                    Console.WriteLine(i + "~  " + line);
+                                }
                             }
                             i++;
                         }
